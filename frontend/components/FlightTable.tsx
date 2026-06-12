@@ -21,7 +21,7 @@ export default function FlightTable() {
 
   useEffect(() => {
     axios
-      .get("https://flightwatch-3.onrender.com")
+      .get("https://flightwatch-3.onrender.com/api/flights/live")
       .then((res) => setFlights(res.data))
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));

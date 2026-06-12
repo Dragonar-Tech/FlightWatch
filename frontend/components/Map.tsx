@@ -22,7 +22,7 @@ export default function Map() {
   useEffect(() => {
     const fetchFlights = () => {
       axios
-        .get("https://flightwatch-3.onrender.com")
+        .get("https://flightwatch-3.onrender.com/api/flights/live")
         .then((res) => setFlights(res.data))
         .catch((err) => console.error(err));
     };
