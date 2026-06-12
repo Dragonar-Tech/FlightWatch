@@ -5,17 +5,14 @@ import flightRoutes from "./routes/flightRoutes.js";
 import process from "process";
 
 dotenv.config();
-import.meta.url;
 
 const app = express();
-app.use(cors({
-  origin: ["http://localhost:3000", "http://localhost:3001"]
-}));
+
+app.use(cors());
 app.use(express.json());
-
 app.use("/api/flights", flightRoutes);
-
-app.use((err, req, res) => {
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: "Internal Server Error" });
 });
