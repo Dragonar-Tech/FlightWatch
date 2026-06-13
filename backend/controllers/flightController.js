@@ -69,6 +69,24 @@ export async function getFlights(req, res) {
         res.status(500).json({ message: error.message });
     }
 }
+export async function getFlightTrack(req, res) {
+    try {
+        const { icao24 } = req.params;
+        const { data } = await axios.get(`https://opensky-network.org/api/tracks/all`, {
+            params: { icao24, time: 0 },
+            auth: {
+                username: process.env.OPENSKY_USERNAME,
+                password: process.env.OPENSKY_PASSWORD
+            }
+        });
+
+        const path = data.path?.map((p) => [p[1], p[2]]) || [];
+        res.status(200).json({ path });
+    } catch (error) {
+        console.error("Track error:", error.message);
+        res.status(500).json({ message: error.message, path: [] });
+    }
+}
 
 export async function getFlightById(req, res) {
     try {

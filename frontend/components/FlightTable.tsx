@@ -13,11 +13,15 @@ interface Flight {
   heading: number;
 }
 
-export default function FlightTable() {
+interface Props {
+  selected: Flight | null;
+  onSelect: (flight: Flight | null) => void;
+}
+
+export default function FlightTable({ selected, onSelect }: Props) {
   const [flights, setFlights] = useState<Flight[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
-  const [selected, setSelected] = useState<Flight | null>(null);
 
   useEffect(() => {
     axios
@@ -41,12 +45,11 @@ export default function FlightTable() {
         value={search}
         onChange={(e) => {
           setSearch(e.target.value);
-          setSelected(null);
+          onSelect(null);
         }}
         className="w-full px-3 py-2 rounded-md bg-white/5 border border-white/10 text-white text-xs placeholder-white/30 focus:outline-none focus:border-blue-500/60 backdrop-blur-md transition"
       />
 
-      {/* Flight detail card */}
       {selected && (
         <div className="bg-white/5 border border-blue-500/30 rounded-md px-3 py-3 text-xs backdrop-blur-md">
           <div className="flex justify-between items-center mb-2">
@@ -54,7 +57,7 @@ export default function FlightTable() {
               {selected.callsign || "Unknown"}
             </span>
             <button
-              onClick={() => setSelected(null)}
+              onClick={() => onSelect(null)}
               className="text-white/30 hover:text-white text-xs"
             >
               ✕
@@ -65,7 +68,7 @@ export default function FlightTable() {
             <span className="text-white">{selected.country}</span>
             <span className="text-white/40">Altitude</span>
             <span className="text-white">
-              {selected.altitude ? `${Math.round(selected.altitude)} m` : "—"}
+              {selected.altitude ? `${Math.round(selected.altitude)}m` : "—"}
             </span>
             <span className="text-white/40">Speed</span>
             <span className="text-white">
@@ -96,7 +99,7 @@ export default function FlightTable() {
           {filtered.slice(0, 20).map((f) => (
             <div
               key={f.icao}
-              onClick={() => setSelected(f)}
+              onClick={() => onSelect(f)}
               className="bg-white/5 hover:bg-white/10 border border-white/5 hover:border-blue-500/30 rounded-md px-3 py-2 text-xs transition cursor-pointer"
             >
               <div className="flex justify-between items-center">
