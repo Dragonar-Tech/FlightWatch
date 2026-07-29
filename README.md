@@ -2,7 +2,7 @@
 
 A real-time flight tracking web app. Live aircraft positions worldwide on an interactive dark map, with search, filtering, and per-flight detail — built on the OpenSky Network API.
 
-**Live demo:** [flight-watch-alpha.vercel.app](https://flight-watch-alpha.vercel.app)
+**Live demo:** [flight-watch-three.vercel.app/](flight-watch-three.vercel.app/)
 
 ## Features
 
