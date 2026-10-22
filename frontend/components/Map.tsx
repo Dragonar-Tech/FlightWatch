@@ -83,6 +83,7 @@ export default function Map({ selected }: { selected: Flight | null }) {
         zoomControl={false}
       >
         <TileLayer
+          className="flightwatch-dark-tiles"
           url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution="© OpenStreetMap contributors"
         />
