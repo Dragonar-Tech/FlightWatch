@@ -43,7 +43,7 @@ cd backend
 npm install
 ```
 
-Create a `.env` file in `backend/`:
+Create `backend/.env` for the database-backed saved-flight endpoints (live flights do not require MySQL):
 
 ```env
 DB_HOST=your-mysql-host
@@ -68,6 +68,8 @@ npm run dev
 
 The API runs on `http://localhost:3001` by default.
 
+The live feed is fetched by the backend from OpenSky. The backend now gives that request a 12-second timeout and returns a cached response when available, so a stalled upstream request cannot leave the UI loading forever.
+
 ### Frontend setup
 
 ```bash
@@ -78,7 +80,9 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-> Note: the frontend currently points at the deployed Render backend URL. To run fully local end-to-end, update the API base URL in `components/FlightTable.tsx` and `components/Map.tsx`.
+The frontend uses `http://localhost:3001` by default. To use a deployed backend, set `NEXT_PUBLIC_API_BASE_URL` in `frontend/.env.local` to its origin, for example `https://your-backend.example.com`, then restart the frontend.
+
+The map uses OpenStreetMap standard tiles and does not need a basemapsapi.key or any other map API key. Keep the visible OpenStreetMap attribution and follow its tile usage policy.
 
 ## API Endpoints
 
@@ -93,7 +97,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Data Source
 
-Flight data comes from the [OpenSky Network](https://opensky-network.org) public API, accessed anonymously (subject to their public rate limits).
+Flight data comes from the [OpenSky Network](https://opensky-network.org) API. Anonymous access is subject to OpenSky's current availability and rate limits; if the feed is temporarily unavailable, the backend uses its last cached response when one exists.
 
 ## License
 

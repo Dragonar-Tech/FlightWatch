@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+const API_BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001").replace(/\/$/, "");
+
 interface Flight {
   icao: string;
   callsign: string;
@@ -22,14 +24,26 @@ export default function FlightTable({ selected, onSelect }: Props) {
   const [flights, setFlights] = useState<Flight[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
-    axios
-      .get("https://flightwatch-3.onrender.com/api/flights/live")
-      .then((res) => setFlights(res.data))
-      .catch((err) => console.error(err))
-      .finally(() => setLoading(false));
-  }, []);
+    let active = true;
+    const fetchFlights = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const response = await axios.get(`${API_BASE_URL}/api/flights/live`, { timeout: 20000 });
+        if (active) setFlights(Array.isArray(response.data) ? response.data : []);
+      } catch {
+        if (active) setError("Could not load flights. Check that the backend is running, then retry.");
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+    void fetchFlights();
+    return () => { active = false; };
+  }, [retryCount]);
 
   const filtered = flights.filter(
     (f) =>
@@ -91,10 +105,16 @@ export default function FlightTable({ selected, onSelect }: Props) {
       {loading && (
         <p className="text-white/30 text-xs px-1">fetching flights...</p>
       )}
-      {!loading && search && filtered.length === 0 && (
+      {!loading && error && (
+        <div className="text-xs px-1 text-amber-200">
+          <p>{error}</p>
+          <button onClick={() => setRetryCount((count) => count + 1)} className="mt-1 underline">Retry</button>
+        </div>
+      )}
+      {!loading && !error && search && filtered.length === 0 && (
         <p className="text-white/30 text-xs px-1">no results.</p>
       )}
-      {!loading && search && filtered.length > 0 && (
+      {!loading && !error && search && filtered.length > 0 && (
         <div className="flex flex-col gap-1 max-h-64 overflow-y-auto pr-1">
           {filtered.slice(0, 20).map((f) => (
             <div
@@ -117,7 +137,7 @@ export default function FlightTable({ selected, onSelect }: Props) {
         </div>
       )}
 
-      {!loading && !search && (
+      {!loading && !error && !search && (
         <p className="text-white/20 text-[10px] px-1">
           {flights.length} flights tracked worldwide
         </p>

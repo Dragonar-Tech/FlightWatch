@@ -30,7 +30,7 @@ export async function getLiveFlights(req, res) {
             return res.status(200).json(cached.flights);
         }
 
-        const { data } = await axios.get("https://opensky-network.org/api/states/all");
+        const { data } = await axios.get("https://opensky-network.org/api/states/all", { timeout: 12000 });
 
         if (!data.states) return res.status(200).json([]);
 
@@ -43,7 +43,7 @@ export async function getLiveFlights(req, res) {
             altitude: s[7],
             velocity: s[9],
             heading: s[10],
-        })).filter(f => f.latitude && f.longitude);
+        })).filter(f => Number.isFinite(f.latitude) && Number.isFinite(f.longitude));
 
         writeCache(flights);
         res.status(200).json(flights);
@@ -69,6 +69,7 @@ export async function getFlightTrack(req, res) {
         const { icao24 } = req.params;
         const { data } = await axios.get(`https://opensky-network.org/api/tracks/all`, {
             params: { icao24, time: 0 },
+            timeout: 12000,
         });
 
         const path = data.path?.map((p) => [p[1], p[2]]) || [];

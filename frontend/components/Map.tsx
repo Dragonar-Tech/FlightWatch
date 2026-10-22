@@ -12,6 +12,8 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import axios from "axios";
 
+const API_BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001").replace(/\/$/, "");
+
 interface Flight {
   icao: string;
   callsign: string;
@@ -40,8 +42,8 @@ export default function Map({ selected }: { selected: Flight | null }) {
   useEffect(() => {
     const fetchFlights = () => {
       axios
-        .get("https://flightwatch-3.onrender.com/api/flights/live")
-        .then((res) => setFlights(res.data))
+        .get(`${API_BASE_URL}/api/flights/live`, { timeout: 20000 })
+        .then((res) => setFlights(Array.isArray(res.data) ? res.data : []))
         .catch((err) => console.error(err));
     };
 
@@ -55,7 +57,8 @@ export default function Map({ selected }: { selected: Flight | null }) {
 
     axios
       .get(
-        `https://flightwatch-3.onrender.com/api/flights/track/${selected.icao}`,
+        `${API_BASE_URL}/api/flights/track/${selected.icao}`,
+        { timeout: 15000 },
       )
       .then((res) => setTrack(res.data.path || []))
       .catch(() => setTrack([]));
@@ -80,8 +83,8 @@ export default function Map({ selected }: { selected: Flight | null }) {
         zoomControl={false}
       >
         <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-          attribution="© OpenStreetMap © CARTO"
+          url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution="© OpenStreetMap contributors"
         />
         <FlyTo selected={selected} />
 
