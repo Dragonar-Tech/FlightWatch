@@ -23,5 +23,5 @@ body {
 }
 
 .flightwatch-dark-tiles {
-  filter: invert(1) hue-rotate(180deg) brightness(0.55) contrast(1.25) saturate(0.35);
+  filter: invert(1) hue-rotate(180deg) brightness(0.82) contrast(0.95) saturate(0.65);
 }
